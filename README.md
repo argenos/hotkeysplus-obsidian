@@ -11,3 +11,7 @@ This repository contains a few shortcuts that I use with [Obsidian](https://obsi
 ## Demo
 
 ![toggle-todos](https://user-images.githubusercontent.com/5426039/89807985-b1278f00-db39-11ea-9cc1-7fc26fab6fd8.gif).
+
+## Installing
+
+Unzip the [latest release](https://github.com/argenos/hotkeysplus-obsidian/releases/latest) into your `<vault>/.obsidian/plugins/` folder.
