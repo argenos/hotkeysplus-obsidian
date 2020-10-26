@@ -1,7 +1,7 @@
 {
-  "id": "obsidian-sample-plugin",
-  "name": "Sample Plugin",
-  "description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+  "id": "hotkeysplus-obsidian",
+  "name": "Hotkeys++",
+  "description": "Additional hotkeys to do common things in Obsidian",
   "isDesktopOnly": false,
   "js": "main.js",
   "css": "styles.css"

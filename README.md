@@ -1,22 +1,13 @@
-## Obsidian Sample Plugin
+# hotkeysplus-obsidian
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+This repository contains a few shortcuts that I use with [Obsidian](https://obsidian.md/). The defaults hotkeys are:
 
-This project uses Typescript to provide type checking and documentation.
-The repo contains the latest plugin API (obsidian.d.ts) in Typescript Definition format, which contains TSDoc comments describing what it does.
+| Hotkey                                            | Action                                     |
+| ------------------------------------------------- | ------------------------------------------ |
+| <kbd>Ctrl</kbd> + <kbd>M</kbd>                    | Toggle between checkmarks.                 |
+| <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> | Toggle between ordered and unordered lists.|
+| <kbd>Ctrl</kbd> + <kbd><</kbd>                    | Toggle blockquotes.                        |
 
-**Note:** The Obsidian API is still in early alpha and is subject to change at any time!
+## Demo
 
-### How to use
-
-- Clone this repo.
-- `npm i` or `yarn` to install dependencies
-- `npm run dev` to start compilation in watch mode.
-
-### How to install the plugin
-
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `vault/.obsidian/plugins/plugin-id/`.
-
-### API Documentation
-
-See https://github.com/obsidianmd/obsidian-api
+![toggle-todos](https://user-images.githubusercontent.com/5426039/89807985-b1278f00-db39-11ea-9cc1-7fc26fab6fd8.gif).

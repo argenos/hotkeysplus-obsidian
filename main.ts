@@ -1,77 +1,156 @@
-import { App, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import {
+  App,
+  Modal,
+  Notice,
+  Plugin,
+  PluginSettingTab,
+  Setting,
+} from "obsidian";
 
-export default class MyPlugin extends Plugin {
-	onInit() {
+export default class HotkeysPlus extends Plugin {
+  onInit() {}
 
-	}
+  onload() {
+    console.log("Loading Hotkeys++ plugin");
 
-	onload() {
-		console.log('loading plugin');
+    this.addCommand({
+      id: "better-toggle-todo",
+      name: "Toggle to-do lists",
+      callback: () => this.toggleTodos(),
+      hotkeys: [
+        {
+          modifiers: ["Mod"],
+          key: "m",
+        },
+      ],
+    });
 
-		this.addRibbonIcon('dice', 'Sample Plugin', () => {
-			new Notice('This is a notice!');
-		});
+    this.addCommand({
+      id: "toggle-bullet-number",
+      name: "Toggle line to bulleted or numbered lists",
+      callback: () => this.toggleLists(),
+      hotkeys: [
+        {
+          modifiers: ["Mod", "Shift"],
+          key: "m",
+        },
+      ],
+    });
 
-		this.addStatusBarItem().setText('Status Bar Text');
+    this.addCommand({
+      id: "toggle-block-quote",
+      name: "Toggle line to block quote",
+      callback: () => this.toggleBlockQuote(),
+      hotkeys: [
+        {
+          modifiers: ["Mod"],
+          key: "<",
+        },
+      ],
+    });
+  }
 
-		this.addCommand({
-			id: 'open-sample-modal',
-			name: 'Open Sample Modal',
-			// callback: () => {
-			// 	console.log('Simple Callback');
-			// },
-			checkCallback: (checking: boolean) => {
-				let leaf = this.app.workspace.activeLeaf;
-				if (leaf) {
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-					return true;
-				}
-				return false;
-			}
-		});
+  onunload() {
+    console.log("Unloading Hotkeys++ plugin");
+  }
 
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-	}
+  getSelectedText(editor: any) {
+    if (editor.somethingSelected()) {
+      // Toggle to-dos under the selection
+      let cursorStart = editor.getCursor(true);
+      let cursorEnd = editor.getCursor(false);
+      let content = editor.getRange(
+        { line: cursorStart.line, ch: 0 },
+        { line: cursorEnd.line, ch: editor.getLine(cursorEnd.line).length }
+      );
 
-	onunload() {
-		console.log('unloading plugin');
-	}
-}
+      return {
+        start: { line: cursorStart.line, ch: 0 },
+        end: {
+          line: cursorEnd.line,
+          ch: editor.getLine(cursorEnd.line).length,
+        },
+        content: content,
+      };
+    } else {
+      // Toggle the todo in the line
+      var lineNr = editor.getCursor().line;
+      var contents = editor.getDoc().getLine(lineNr);
+      let cursorStart = {
+        line: lineNr,
+        ch: 0,
+      };
+      let cursorEnd = {
+        line: lineNr,
+        ch: contents.length,
+      };
+      let content = editor.getRange(cursorStart, cursorEnd);
+      return { start: cursorStart, end: cursorEnd, content: content };
+    }
+  }
 
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
+  toggleElement(re: RegExp, subst: any) {
+    var activeLeaf: any = this.app.workspace.activeLeaf;
+    var editor = activeLeaf.view.sourceMode.cmEditor;
+    var selection = editor.somethingSelected();
+    var selectedText = this.getSelectedText(editor);
 
-	onOpen() {
-		let {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
+    var newString = selectedText.content.replace(re, subst);
+    editor.replaceRange(newString, selectedText.start, selectedText.end);
 
-	onClose() {
-		let {contentEl} = this;
-		contentEl.empty();
-	}
-}
+    // Keep cursor in the same place
+    if (selection) {
+      editor.setSelection(selectedText.start, {
+        line: selectedText.end.line,
+        ch: editor.getLine(selectedText.end.line).length,
+      });
+    }
+  }
 
-class SampleSettingTab extends PluginSettingTab {
-	display(): void {
-		let {containerEl} = this;
+  toggleTodos() {
+    var re = /-\s\[ \]\s|-\s\[x\]\s|\*\s|-\s|\d+\.\s|^/gim;
+    return this.toggleElement(re, this.replaceTodoElement);
+  }
 
-		containerEl.empty();
+  toggleLists() {
+    var re = /-\s\[ \]\s|-\s\[x\]\s|\*\s|-\s|\d+\.\s|^/gim;
+    return this.toggleElement(re, this.replaceListElement);
+  }
 
-		containerEl.createEl('h2', {text: 'Settings for my awesome plugin.'});
+  toggleBlockQuote() {
+    var re = />\s|^/gim;
+    return this.toggleElement(re, this.replaceBlockQuote);
+  }
 
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text.setPlaceholder('Enter your secret')
-				.setValue('')
-				.onChange((value) => {
-					console.log('Secret: ' + value);
-				}));
+  replaceListElement(startText: string) {
+    if (startText === "- ") {
+      return "1. ";
+    } else if (startText === "") {
+      return "- ";
+    } else if (startText === "1. ") {
+      return "";
+    } else {
+      return "- ";
+    }
+  }
 
-	}
+  replaceBlockQuote(startText: string) {
+    if (startText === "> ") {
+      return "";
+    } else if (startText === "") {
+      return "> ";
+    } else {
+      return "> ";
+    }
+  }
+
+  replaceTodoElement(startText: string) {
+    if (startText === "- [ ] ") {
+      return "- [x] ";
+    } else if (startText === "- [x] ") {
+      return "- ";
+    } else {
+      return "- [ ] ";
+    }
+  }
 }
