@@ -51,7 +51,7 @@ export default class HotkeysPlus extends Plugin {
 
     this.addCommand({
       id: "toggle-embed",
-      name: "Toggle link on line to embed",
+      name: "Toggle line to embed internal links",
       callback: () => this.toggleEmbed(),
       hotkeys: [
         {
