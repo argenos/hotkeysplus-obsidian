@@ -48,6 +48,18 @@ export default class HotkeysPlus extends Plugin {
         },
       ],
     });
+
+    this.addCommand({
+      id: "toggle-embed",
+      name: "Toggle link on line to embed",
+      callback: () => this.toggleEmbed(),
+      hotkeys: [
+        {
+          modifiers: ["Mod", "Shift"],
+          key: "1",
+        },
+      ],
+    });
   }
 
   onunload() {
@@ -122,6 +134,11 @@ export default class HotkeysPlus extends Plugin {
     return this.toggleElement(re, this.replaceBlockQuote);
   }
 
+  toggleEmbed() {
+    var re = /\S*\[\[/gim;
+      return this.toggleElement(re, this.replaceEmbed);
+  }
+
   replaceListElement(startText: string) {
     if (startText === "- ") {
       return "1. ";
@@ -141,6 +158,18 @@ export default class HotkeysPlus extends Plugin {
       return "> ";
     } else {
       return "> ";
+    }
+  }
+
+  replaceEmbed(startText: string) {
+    if (startText === "![[") {
+      return "[[";
+    }
+    else if (startText === "[[") {
+        return "![[";
+    }
+    else {
+        return "";
     }
   }
 
