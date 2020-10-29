@@ -2,7 +2,8 @@
   "id": "hotkeysplus-obsidian",
   "name": "Hotkeys++",
   "description": "Additional hotkeys to do common things in Obsidian",
-  "isDesktopOnly": false,
-  "js": "main.js",
-  "css": "styles.css"
+  "version": "0.2.0",
+  "author": "Argentina Ortega Sainz",
+  "authorUrl": "",
+  "isDesktopOnly": false
 }
