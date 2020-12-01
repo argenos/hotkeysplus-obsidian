@@ -60,6 +60,26 @@ export default class HotkeysPlus extends Plugin {
         },
       ],
     });
+
+    this.addCommand({
+      id: "duplicate-lines",
+      name: "Duplicate the current line or selected lines",
+      callback: () => this.duplicateLines(),
+      hotkeys: [
+        {
+          modifiers: ["Mod"],
+          key: "d",
+        },
+      ],
+    });
+  }
+
+  duplicateLines() {
+    var activeLeaf: any = this.app.workspace.activeLeaf;
+    var editor = activeLeaf.view.sourceMode.cmEditor;
+    var selectedText = this.getSelectedText(editor);
+    var newString = selectedText.content + "\n";
+    editor.replaceRange(newString, selectedText.start, selectedText.start);
   }
 
   onunload() {

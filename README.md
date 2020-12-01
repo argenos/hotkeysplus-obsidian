@@ -8,6 +8,7 @@ This repository contains a few shortcuts that I use with [Obsidian](https://obsi
 | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> | Toggle between ordered and unordered lists.|
 | <kbd>Ctrl</kbd> + <kbd><</kbd>                    | Toggle blockquotes.                        |
 | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>1</kbd> | Toggle embeds for internal links.          |
+| <kbd>Ctrl</kbd> + <kbd>D</kbd>                    | Duplicate current line or selected lines   |
 
 ## Demo
 
