@@ -65,12 +65,6 @@ export default class HotkeysPlus extends Plugin {
       id: "duplicate-lines",
       name: "Duplicate the current line or selected lines",
       callback: () => this.duplicateLines(),
-      hotkeys: [
-        {
-          modifiers: ["Mod"],
-          key: "d",
-        },
-      ],
     });
   }
 
