@@ -9,6 +9,7 @@ This repository contains a few shortcuts that I use with [Obsidian](https://obsi
 | <kbd>Ctrl</kbd> + <kbd><</kbd>                    | Toggle blockquotes.                        |              |
 | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>1</kbd> | Toggle embeds for internal links.          | [lynchjames](https://github.com/lynchjames) |
 | Blank by default                                  | Duplicate current line or selected lines   | [NomarCub](https://github.com/NomarCub) |
+| Blank by default                                  | Insert line below/above current line       | [Vinzent](https://github.com/Vinzent03) |
 
 ## Demo
 
