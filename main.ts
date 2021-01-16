@@ -1,14 +1,10 @@
 import {
-  App,
-  Modal,
-  Notice,
-  Plugin,
-  PluginSettingTab,
-  Setting,
+  MarkdownView,
+  Plugin
 } from "obsidian";
 
 export default class HotkeysPlus extends Plugin {
-  onInit() {}
+  onInit() { }
 
   onload() {
     console.log("Loading Hotkeys++ plugin");
@@ -66,6 +62,44 @@ export default class HotkeysPlus extends Plugin {
       name: "Duplicate the current line or selected lines",
       callback: () => this.duplicateLines(),
     });
+
+    this.addCommand({
+      id: 'insert-line-above',
+      name: 'Insert line above current line',
+      callback: () => this.insertLine("above"),
+    });
+    this.addCommand({
+      id: 'insert-line-below',
+      name: 'Insert line below current line',
+      callback: () => this.insertLine("below"),
+    });
+  }
+  insertLine(mode: "above" | "below") {
+    const view = this.app.workspace.activeLeaf.view as MarkdownView;
+    const editor = view.sourceMode.cmEditor as CodeMirror.Editor;
+    const lineNumber = editor.getCursor().line;
+    const currentLineText = editor.getLine(lineNumber);
+    let newLineText = "";
+    if (currentLineText.trim().startsWith("- ")) {
+      newLineText = currentLineText.substring(0, currentLineText.indexOf("- ") + 2);
+    }
+    for (let i = 1; i < 30; i++) {
+      if (currentLineText.trim().startsWith(i.toString() + ". ")) {
+        let correction: number;
+        if (mode == "above")
+          correction = -1;
+        else
+          correction = 1;
+        newLineText = currentLineText.substring(0, currentLineText.indexOf(i.toString() + ". ")) + (i + correction).toString() + ". ";
+      }
+    }
+    if (mode == "above") {
+      editor.replaceRange(newLineText + "\n", { line: lineNumber, ch: 0 });
+      editor.setCursor({ line: lineNumber, ch: newLineText.length });
+    } else {
+      editor.replaceRange("\n" + newLineText, { line: lineNumber, ch: currentLineText.length });
+      editor.setCursor({ line: lineNumber + 1, ch: newLineText.length });
+    }
   }
 
   duplicateLines() {
@@ -150,7 +184,7 @@ export default class HotkeysPlus extends Plugin {
 
   toggleEmbed() {
     var re = /\S*\[\[/gim;
-      return this.toggleElement(re, this.replaceEmbed);
+    return this.toggleElement(re, this.replaceEmbed);
   }
 
   replaceListElement(startText: string) {
@@ -180,10 +214,10 @@ export default class HotkeysPlus extends Plugin {
       return "[[";
     }
     else if (startText === "[[") {
-        return "![[";
+      return "![[";
     }
     else {
-        return "";
+      return "";
     }
   }
 
