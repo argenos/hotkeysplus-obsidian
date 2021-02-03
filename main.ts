@@ -168,12 +168,12 @@ export default class HotkeysPlus extends Plugin {
   }
 
   toggleTodos() {
-    var re = /-\s\[ \]\s|-\s\[x\]\s|\*\s|-\s|\d+\.\s|^/gim;
+    var re = /(^\s*|^\t*)(-\s\[ \]\s|-\s\[x\]\s|\*\s|-\s|\d*\.\s|\*\s|\b|^)([^\n\r]*)/gim;
     return this.toggleElement(re, this.replaceTodoElement);
   }
 
   toggleLists() {
-    var re = /-\s\[ \]\s|-\s\[x\]\s|\*\s|-\s|\d+\.\s|^/gim;
+    var re = /(^\s*|^\t*)(-\s\[ \]\s|-\s\[x\]\s|\*\s|-\s|\d*\.\s|\*\s|\b|^)([^\n\r]*)/gim;
     return this.toggleElement(re, this.replaceListElement);
   }
 
@@ -187,15 +187,15 @@ export default class HotkeysPlus extends Plugin {
     return this.toggleElement(re, this.replaceEmbed);
   }
 
-  replaceListElement(startText: string) {
+  replaceListElement(match:string, spaces:string, startText: string, sentence: string) {
     if (startText === "- ") {
-      return "1. ";
+      return spaces + "1. " + sentence;
     } else if (startText === "") {
-      return "- ";
+      return spaces + "- " + sentence;
     } else if (startText === "1. ") {
-      return "";
+      return spaces + "" + sentence;
     } else {
-      return "- ";
+      return spaces + "- " + sentence;
     }
   }
 
@@ -221,13 +221,13 @@ export default class HotkeysPlus extends Plugin {
     }
   }
 
-  replaceTodoElement(startText: string) {
+  replaceTodoElement(match:string, spaces:string, startText: string, sentence: string) {
     if (startText === "- [ ] ") {
-      return "- [x] ";
+      return spaces + "- [x] " + sentence;
     } else if (startText === "- [x] ") {
-      return "- ";
+      return spaces + "- " + sentence;
     } else {
-      return "- [ ] ";
+      return spaces + "- [ ] " + sentence;
     }
   }
 }
