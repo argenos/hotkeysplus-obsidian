@@ -62,6 +62,11 @@ export default class HotkeysPlus extends Plugin {
       name: "Duplicate the current line or selected lines",
       callback: () => this.duplicateLines(),
     });
+    this.addCommand({
+      id: "clean-selected",
+      name: "Trims selected text and removes new line characters.",
+      callback: () => this.cleanSelected(),
+    });
 
     this.addCommand({
       id: 'insert-line-above',
@@ -109,6 +114,14 @@ export default class HotkeysPlus extends Plugin {
     var newString = selectedText.content + "\n";
     editor.replaceRange(newString, selectedText.start, selectedText.start);
   }
+  cleanSelected() {
+		var activeLeaf: any = this.app.workspace.activeLeaf;
+		var editor = activeLeaf.view.sourceMode.cmEditor;
+    var selectedText = this.getSelectedText(editor);
+    var newString = selectedText.content.trim().replace(/(\r\n|\n|\r)/gm, ' ');
+    newString = newString.replace(/  +/gm, ' ');
+		editor.replaceRange(newString, selectedText.start, selectedText.end);
+	}
 
   onunload() {
     console.log("Unloading Hotkeys++ plugin");
