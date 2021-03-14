@@ -64,7 +64,7 @@ export default class HotkeysPlus extends Plugin {
     });
     this.addCommand({
       id: "clean-selected",
-      name: "Removes new line characters and html elements",
+      name: "Trims selected text and removes new line characters.",
       callback: () => this.cleanSelected(),
     });
 
@@ -118,11 +118,7 @@ export default class HotkeysPlus extends Plugin {
 		var activeLeaf: any = this.app.workspace.activeLeaf;
 		var editor = activeLeaf.view.sourceMode.cmEditor;
     var selectedText = this.getSelectedText(editor);
-    // removing new line chars
     var newString = selectedText.content.trim().replace(/(\r\n|\n|\r)/gm, ' ');
-    //removing html
-    newString = newString.replace(/<\/?\w+\/?>/gm, ' ');
-    // removing access white space
     newString = newString.replace(/  +/gm, ' ');
 		editor.replaceRange(newString, selectedText.start, selectedText.end);
 	}
