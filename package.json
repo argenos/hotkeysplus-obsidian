@@ -1,6 +1,6 @@
 {
   "name": "hotkeysplus-obsidian",
-  "version": "0.9.7",
+  "version": "0.2.6",
   "description": "Hotkeys to do common stuff in Obsidian",
   "main": "main.js",
   "scripts": {
