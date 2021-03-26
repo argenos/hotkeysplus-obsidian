@@ -1,4 +1,5 @@
 import {
+  Editor,
   MarkdownView,
   Plugin
 } from "obsidian";
@@ -79,9 +80,12 @@ export default class HotkeysPlus extends Plugin {
       callback: () => this.insertLine("below"),
     });
   }
-  insertLine(mode: "above" | "below") {
-    const view = this.app.workspace.activeLeaf.view as MarkdownView;
-    const editor = view.sourceMode.cmEditor as CodeMirror.Editor;
+
+  insertLine(mode: "above" | "below"): void {
+    const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+    if (!view) return;
+
+    const editor = view.editor;
     const lineNumber = editor.getCursor().line;
     const currentLineText = editor.getLine(lineNumber);
     let newLineText = "";
@@ -100,39 +104,43 @@ export default class HotkeysPlus extends Plugin {
     }
     if (mode == "above") {
       editor.replaceRange(newLineText + "\n", { line: lineNumber, ch: 0 });
-      editor.setCursor({ line: lineNumber, ch: newLineText.length });
+      editor.setSelection({ line: lineNumber, ch: newLineText.length });
     } else {
       editor.replaceRange("\n" + newLineText, { line: lineNumber, ch: currentLineText.length });
-      editor.setCursor({ line: lineNumber + 1, ch: newLineText.length });
+      editor.setSelection({ line: lineNumber + 1, ch: newLineText.length });
     }
   }
 
-  duplicateLines() {
-    var activeLeaf: any = this.app.workspace.activeLeaf;
-    var editor = activeLeaf.view.sourceMode.cmEditor;
-    var selectedText = this.getSelectedText(editor);
-    var newString = selectedText.content + "\n";
+  duplicateLines(): void {
+    const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+    if (!view) return;
+
+    const editor = view.editor;
+    const selectedText = this.getSelectedText(editor);
+    const newString = selectedText.content + "\n";
     editor.replaceRange(newString, selectedText.start, selectedText.start);
   }
-  cleanSelected() {
-		var activeLeaf: any = this.app.workspace.activeLeaf;
-		var editor = activeLeaf.view.sourceMode.cmEditor;
-    var selectedText = this.getSelectedText(editor);
-    var newString = selectedText.content.trim().replace(/(\r\n|\n|\r)/gm, ' ');
+  cleanSelected(): void {
+    const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+    if (!view) return;
+
+    const editor = view.editor;
+    const selectedText = this.getSelectedText(editor);
+    let newString = selectedText.content.trim().replace(/(\r\n|\n|\r)/gm, ' ');
     newString = newString.replace(/  +/gm, ' ');
-		editor.replaceRange(newString, selectedText.start, selectedText.end);
-	}
+    editor.replaceRange(newString, selectedText.start, selectedText.end);
+  }
 
   onunload() {
     console.log("Unloading Hotkeys++ plugin");
   }
 
-  getSelectedText(editor: any) {
+  getSelectedText(editor: Editor) {
     if (editor.somethingSelected()) {
       // Toggle to-dos under the selection
-      let cursorStart = editor.getCursor(true);
-      let cursorEnd = editor.getCursor(false);
-      let content = editor.getRange(
+      const cursorStart = editor.getCursor("from");
+      const cursorEnd = editor.getCursor("to");
+      const content = editor.getRange(
         { line: cursorStart.line, ch: 0 },
         { line: cursorEnd.line, ch: editor.getLine(cursorEnd.line).length }
       );
@@ -147,28 +155,30 @@ export default class HotkeysPlus extends Plugin {
       };
     } else {
       // Toggle the todo in the line
-      var lineNr = editor.getCursor().line;
-      var contents = editor.getDoc().getLine(lineNr);
-      let cursorStart = {
+      const lineNr = editor.getCursor().line;
+      const contents = editor.getDoc().getLine(lineNr);
+      const cursorStart = {
         line: lineNr,
         ch: 0,
       };
-      let cursorEnd = {
+      const cursorEnd = {
         line: lineNr,
         ch: contents.length,
       };
-      let content = editor.getRange(cursorStart, cursorEnd);
+      const content = editor.getRange(cursorStart, cursorEnd);
       return { start: cursorStart, end: cursorEnd, content: content };
     }
   }
 
   toggleElement(re: RegExp, subst: any) {
-    var activeLeaf: any = this.app.workspace.activeLeaf;
-    var editor = activeLeaf.view.sourceMode.cmEditor;
-    var selection = editor.somethingSelected();
-    var selectedText = this.getSelectedText(editor);
+    const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+    if (!view) return;
 
-    var newString = selectedText.content.replace(re, subst);
+    const editor = view.editor;
+    const selection = editor.somethingSelected();
+    const selectedText = this.getSelectedText(editor);
+
+    const newString = selectedText.content.replace(re, subst);
     editor.replaceRange(newString, selectedText.start, selectedText.end);
 
     // Keep cursor in the same place
@@ -181,26 +191,26 @@ export default class HotkeysPlus extends Plugin {
   }
 
   toggleTodos() {
-    var re = /(^\s*|^\t*)(-\s\[ \]\s|-\s\[x\]\s|\*\s|-\s|\d*\.\s|\*\s|\b|^)([^\n\r]*)/gim;
+    const re = /(^\s*|^\t*)(-\s\[ \]\s|-\s\[x\]\s|\*\s|-\s|\d*\.\s|\*\s|\b|^)([^\n\r]*)/gim;
     return this.toggleElement(re, this.replaceTodoElement);
   }
 
   toggleLists() {
-    var re = /(^\s*|^\t*)(-\s\[ \]\s|-\s\[x\]\s|\*\s|-\s|\d*\.\s|\*\s|\b|^)([^\n\r]*)/gim;
+    const re = /(^\s*|^\t*)(-\s\[ \]\s|-\s\[x\]\s|\*\s|-\s|\d*\.\s|\*\s|\b|^)([^\n\r]*)/gim;
     return this.toggleElement(re, this.replaceListElement);
   }
 
   toggleBlockQuote() {
-    var re = />\s|^/gim;
+    const re = />\s|^/gim;
     return this.toggleElement(re, this.replaceBlockQuote);
   }
 
   toggleEmbed() {
-    var re = /\S*\[\[/gim;
+    const re = /\S*\[\[/gim;
     return this.toggleElement(re, this.replaceEmbed);
   }
 
-  replaceListElement(match:string, spaces:string, startText: string, sentence: string) {
+  replaceListElement(match: string, spaces: string, startText: string, sentence: string) {
     if (startText === "- ") {
       return spaces + "1. " + sentence;
     } else if (startText === "") {
@@ -234,7 +244,7 @@ export default class HotkeysPlus extends Plugin {
     }
   }
 
-  replaceTodoElement(match:string, spaces:string, startText: string, sentence: string) {
+  replaceTodoElement(match: string, spaces: string, startText: string, sentence: string) {
     if (startText === "- [ ] ") {
       return spaces + "- [x] " + sentence;
     } else if (startText === "- [x] ") {
