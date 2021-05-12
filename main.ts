@@ -79,6 +79,21 @@ export default class HotkeysPlus extends Plugin {
       name: 'Insert line below current line',
       callback: () => this.insertLine("below"),
     });
+
+    this.addCommand({
+      id: 'clear-current-line',
+      name: 'Clear current line',
+      callback: () => this.clearCurrentLine(),
+    });
+  }
+
+  clearCurrentLine(): void{
+    const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+    if (!view) return;
+
+    const editor = view.editor;
+    const lineNumber = editor.getCursor().line;
+    editor.setLine(lineNumber, "")
   }
 
   insertLine(mode: "above" | "below"): void {
