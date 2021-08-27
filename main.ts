@@ -5,7 +5,10 @@ import {
 } from "obsidian";
 
 export default class HotkeysPlus extends Plugin {
-  onInit() { }
+  onInit() {
+    console.log('INITITING');
+    console.log('ok')
+   }
 
   onload() {
     console.log("Loading Hotkeys++ plugin");
@@ -59,10 +62,17 @@ export default class HotkeysPlus extends Plugin {
     });
 
     this.addCommand({
-      id: "duplicate-lines",
-      name: "Duplicate the current line or selected lines",
-      callback: () => this.duplicateLines(),
+      id: "duplicate-lines-down",
+      name: "Copy line or lines down",
+      callback: () => this.duplicateLines("below"),
     });
+
+    this.addCommand({
+      id: "duplicate-lines-up",
+      name: "Copy line or lines up",
+      callback: () => this.duplicateLines("above"),
+    });
+
     this.addCommand({
       id: "clean-selected",
       name: "Trims selected text and removes new line characters.",
@@ -126,14 +136,24 @@ export default class HotkeysPlus extends Plugin {
     }
   }
 
-  duplicateLines(): void {
+  duplicateLines(mode: "above" | "below"): void {
     const view = this.app.workspace.getActiveViewOfType(MarkdownView);
     if (!view) return;
 
     const editor = view.editor;
     const selectedText = this.getSelectedText(editor);
     const newString = selectedText.content + "\n";
-    editor.replaceRange(newString, selectedText.start, selectedText.start);
+    
+    if (mode === "below") {
+      editor.replaceRange(newString, selectedText.start, selectedText.start);
+    }
+    else {
+      const nextLineStart = {
+        ...selectedText.start,
+        line: selectedText.start.line + 1
+      }
+      editor.replaceRange(newString, nextLineStart, nextLineStart);
+    }
   }
   cleanSelected(): void {
     const view = this.app.workspace.getActiveViewOfType(MarkdownView);
