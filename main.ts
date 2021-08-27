@@ -63,13 +63,13 @@ export default class HotkeysPlus extends Plugin {
 
     this.addCommand({
       id: "duplicate-lines-down",
-      name: "Copy line or lines down",
+      name: "Copy line(s) down",
       callback: () => this.duplicateLines("down"),
     });
 
     this.addCommand({
       id: "duplicate-lines-up",
-      name: "Copy line or lines up",
+      name: "Copy line(s) up",
       callback: () => this.duplicateLines("up"),
     });
 
