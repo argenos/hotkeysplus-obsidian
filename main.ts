@@ -144,13 +144,14 @@ export default class HotkeysPlus extends Plugin {
     const selectedText = this.getSelectedText(editor);
     const newString = selectedText.content + "\n";
 
+    console.log(selectedText);
     if (mode === "down") {
       editor.replaceRange(newString, selectedText.start, selectedText.start);
     }
     else {
       const nextLineStart = {
-        ...selectedText.start,
-        line: selectedText.start.line + 1
+        line: selectedText.end.line + 1,
+        ch: 0
       }
       editor.replaceRange(newString, nextLineStart, nextLineStart);
     }
