@@ -64,13 +64,13 @@ export default class HotkeysPlus extends Plugin {
     this.addCommand({
       id: "duplicate-lines-down",
       name: "Copy line or lines down",
-      callback: () => this.duplicateLines("below"),
+      callback: () => this.duplicateLines("down"),
     });
 
     this.addCommand({
       id: "duplicate-lines-up",
       name: "Copy line or lines up",
-      callback: () => this.duplicateLines("above"),
+      callback: () => this.duplicateLines("up"),
     });
 
     this.addCommand({
@@ -136,15 +136,15 @@ export default class HotkeysPlus extends Plugin {
     }
   }
 
-  duplicateLines(mode: "above" | "below"): void {
+  duplicateLines(mode: "up" | "down"): void {
     const view = this.app.workspace.getActiveViewOfType(MarkdownView);
     if (!view) return;
 
     const editor = view.editor;
     const selectedText = this.getSelectedText(editor);
     const newString = selectedText.content + "\n";
-    
-    if (mode === "below") {
+
+    if (mode === "down") {
       editor.replaceRange(newString, selectedText.start, selectedText.start);
     }
     else {
