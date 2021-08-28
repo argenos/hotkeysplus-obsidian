@@ -5,10 +5,7 @@ import {
 } from "obsidian";
 
 export default class HotkeysPlus extends Plugin {
-  onInit() {
-    console.log('INITITING');
-    console.log('ok')
-   }
+  onInit() { }
 
   onload() {
     console.log("Loading Hotkeys++ plugin");
