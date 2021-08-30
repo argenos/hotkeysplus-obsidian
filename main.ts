@@ -139,12 +139,25 @@ export default class HotkeysPlus extends Plugin {
 
     const editor = view.editor;
     const selectedText = this.getSelectedText(editor);
-    const newString = selectedText.content + "\n";
+    let newString = selectedText.content + "\n";
 
     if (mode === "down") {
       editor.replaceRange(newString, selectedText.start, selectedText.start);
     }
     else {
+      if (selectedText.end.line === editor.lastLine()) {
+        // create a new line so that lastLine + 1 exists
+        const newLastLineContent = editor.getLine(editor.lastLine()) + "\n"; 
+
+        const cursorAnchor = editor.getCursor("anchor");
+        const cursorHead = editor.getCursor("head");
+        
+        editor.setLine(editor.lastLine(), newLastLineContent);
+        editor.setSelection(cursorAnchor, cursorHead); // preserve original cursor / selection state (adding a new line may have pushed the cursor down)
+
+        newString = selectedText.content; // because there is no other content on the newly created line, we don't need a trailing newline char
+      }
+      
       const nextLineStart = {
         line: selectedText.end.line + 1,
         ch: 0
@@ -152,6 +165,7 @@ export default class HotkeysPlus extends Plugin {
       editor.replaceRange(newString, nextLineStart, nextLineStart);
     }
   }
+  
   cleanSelected(): void {
     const view = this.app.workspace.getActiveViewOfType(MarkdownView);
     if (!view) return;
