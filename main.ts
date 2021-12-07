@@ -4,6 +4,17 @@ import {
   Plugin
 } from "obsidian";
 
+interface VaultConfig {
+  "readableLineLength": boolean; 
+}
+
+declare module "obsidian" {
+    interface Vault {
+        getConfig<T extends keyof VaultConfig>(config: T): VaultConfig[T];
+        setConfig<T extends keyof VaultConfig>(config: T, value: VaultConfig[T]): void;
+    }
+}
+
 export default class HotkeysPlus extends Plugin {
   onInit() { }
 
@@ -85,6 +96,15 @@ export default class HotkeysPlus extends Plugin {
       name: 'Clear current line',
       callback: () => this.clearCurrentLine(),
     });
+    
+    this.addCommand({
+      id: "toggle-readable-length",
+      name: "Toggle Readable Line Length",
+      callback: () => this.app.vault.setConfig(
+          "readableLineLength",
+          !this.app.vault.getConfig("readableLineLength")
+        );
+     });
   }
 
   clearCurrentLine(): void{
