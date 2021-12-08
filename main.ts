@@ -1,101 +1,95 @@
-import {
-  Editor,
-  MarkdownView,
-  Plugin
-} from "obsidian";
+import { Editor, MarkdownView, Plugin } from 'obsidian';
 
 interface VaultConfig {
-  "readableLineLength": boolean; 
+  readableLineLength: boolean;
 }
 
-declare module "obsidian" {
-    interface Vault {
-        getConfig<T extends keyof VaultConfig>(config: T): VaultConfig[T];
-        setConfig<T extends keyof VaultConfig>(config: T, value: VaultConfig[T]): void;
-    }
+declare module 'obsidian' {
+  interface Vault {
+    getConfig<T extends keyof VaultConfig>(config: T): VaultConfig[T];
+    setConfig<T extends keyof VaultConfig>(config: T, value: VaultConfig[T]): void;
+  }
 }
 
 export default class HotkeysPlus extends Plugin {
-  onInit() { }
-
   onload() {
-    console.log("Loading Hotkeys++ plugin");
+    console.log('Loading Hotkeys++ plugin');
 
     this.addCommand({
-      id: "better-toggle-todo",
-      name: "Toggle to-do lists",
+      id: 'better-toggle-todo',
+      name: 'Toggle to-do lists',
       callback: () => this.toggleTodos(),
       hotkeys: [
         {
-          modifiers: ["Mod"],
-          key: "m",
+          modifiers: ['Mod'],
+          key: 'm',
         },
       ],
     });
 
     this.addCommand({
-      id: "toggle-bullet-number",
-      name: "Toggle line to bulleted or numbered lists",
+      id: 'toggle-bullet-number',
+      name: 'Toggle line to bulleted or numbered lists',
       callback: () => this.toggleLists(),
       hotkeys: [
         {
-          modifiers: ["Mod", "Shift"],
-          key: "m",
+          modifiers: ['Mod', 'Shift'],
+          key: 'm',
         },
       ],
     });
 
     this.addCommand({
-      id: "toggle-block-quote",
-      name: "Toggle line to block quote",
+      id: 'toggle-block-quote',
+      name: 'Toggle line to block quote',
       callback: () => this.toggleBlockQuote(),
       hotkeys: [
         {
-          modifiers: ["Mod"],
-          key: "<",
+          modifiers: ['Mod'],
+          key: '<',
         },
       ],
     });
 
     this.addCommand({
-      id: "toggle-embed",
-      name: "Toggle line to embed internal links",
+      id: 'toggle-embed',
+      name: 'Toggle line to embed internal links',
       callback: () => this.toggleEmbed(),
       hotkeys: [
         {
-          modifiers: ["Mod", "Shift"],
-          key: "1",
+          modifiers: ['Mod', 'Shift'],
+          key: '1',
         },
       ],
     });
 
     this.addCommand({
-      id: "duplicate-lines-down",
-      name: "Copy line(s) down",
-      callback: () => this.duplicateLines("down"),
+      id: 'duplicate-lines-down',
+      name: 'Copy line(s) down',
+      callback: () => this.duplicateLines('down'),
     });
 
     this.addCommand({
-      id: "duplicate-lines-up",
-      name: "Copy line(s) up",
-      callback: () => this.duplicateLines("up"),
+      id: 'duplicate-lines-up',
+      name: 'Copy line(s) up',
+      callback: () => this.duplicateLines('up'),
     });
 
     this.addCommand({
-      id: "clean-selected",
-      name: "Trims selected text and removes new line characters.",
+      id: 'clean-selected',
+      name: 'Trims selected text and removes new line characters.',
       callback: () => this.cleanSelected(),
     });
 
     this.addCommand({
       id: 'insert-line-above',
       name: 'Insert line above current line',
-      callback: () => this.insertLine("above"),
+      callback: () => this.insertLine('above'),
     });
     this.addCommand({
       id: 'insert-line-below',
       name: 'Insert line below current line',
-      callback: () => this.insertLine("below"),
+      callback: () => this.insertLine('below'),
     });
 
     this.addCommand({
@@ -103,89 +97,93 @@ export default class HotkeysPlus extends Plugin {
       name: 'Clear current line',
       callback: () => this.clearCurrentLine(),
     });
-    
+
     this.addCommand({
-      id: "toggle-readable-length",
-      name: "Toggle Readable Line Length",
-      callback: () => this.app.vault.setConfig(
-          "readableLineLength",
-          !this.app.vault.getConfig("readableLineLength")
-        );
-     });
+      id: 'toggle-readable-length',
+      name: 'Toggle Readable Line Length',
+      callback: () =>
+        this.app.vault.setConfig(
+          'readableLineLength',
+          !this.app.vault.getConfig('readableLineLength'),
+        ),
+    });
   }
 
-  clearCurrentLine(): void{
+  clearCurrentLine(): void {
     const view = this.app.workspace.getActiveViewOfType(MarkdownView);
     if (!view) return;
 
     const editor = view.editor;
     const lineNumber = editor.getCursor().line;
-    editor.setLine(lineNumber, "")
+    editor.setLine(lineNumber, '');
   }
 
-  insertLine(mode: "above" | "below"): void {
+  insertLine(mode: 'above' | 'below'): void {
     const view = this.app.workspace.getActiveViewOfType(MarkdownView);
     if (!view) return;
 
     const editor = view.editor;
     const lineNumber = editor.getCursor().line;
     const currentLineText = editor.getLine(lineNumber);
-    let newLineText = "";
-    if (currentLineText.trim().startsWith("- ")) {
-      newLineText = currentLineText.substring(0, currentLineText.indexOf("- ") + 2);
+    let newLineText = '';
+    if (currentLineText.trim().startsWith('- ')) {
+      newLineText = currentLineText.substring(0, currentLineText.indexOf('- ') + 2);
     }
     for (let i = 1; i < 30; i++) {
-      if (currentLineText.trim().startsWith(i.toString() + ". ")) {
+      if (currentLineText.trim().startsWith(i.toString() + '. ')) {
         let correction: number;
-        if (mode == "above")
-          correction = -1;
-        else
-          correction = 1;
-        newLineText = currentLineText.substring(0, currentLineText.indexOf(i.toString() + ". ")) + (i + correction).toString() + ". ";
+        if (mode == 'above') correction = -1;
+        else correction = 1;
+        newLineText =
+          currentLineText.substring(0, currentLineText.indexOf(i.toString() + '. ')) +
+          (i + correction).toString() +
+          '. ';
       }
     }
-    if (mode == "above") {
-      editor.replaceRange(newLineText + "\n", { line: lineNumber, ch: 0 });
+    if (mode == 'above') {
+      editor.replaceRange(newLineText + '\n', { line: lineNumber, ch: 0 });
       editor.setSelection({ line: lineNumber, ch: newLineText.length });
     } else {
-      editor.replaceRange("\n" + newLineText, { line: lineNumber, ch: currentLineText.length });
+      editor.replaceRange('\n' + newLineText, {
+        line: lineNumber,
+        ch: currentLineText.length,
+      });
       editor.setSelection({ line: lineNumber + 1, ch: newLineText.length });
     }
   }
 
-  duplicateLines(mode: "up" | "down"): void {
+  duplicateLines(mode: 'up' | 'down'): void {
     const view = this.app.workspace.getActiveViewOfType(MarkdownView);
     if (!view) return;
 
     const editor = view.editor;
     const selectedText = this.getSelectedText(editor);
-    let newString = selectedText.content + "\n";
+    let newString = selectedText.content + '\n';
 
-    if (mode === "down") {
+    if (mode === 'down') {
       editor.replaceRange(newString, selectedText.start, selectedText.start);
-    }
-    else {
+    } else {
       if (selectedText.end.line === editor.lastLine()) {
         // create a new line so that lastLine + 1 exists
-        const newLastLineContent = editor.getLine(editor.lastLine()) + "\n"; 
+        const newLastLineContent = editor.getLine(editor.lastLine()) + '\n';
 
-        const cursorAnchor = editor.getCursor("anchor");
-        const cursorHead = editor.getCursor("head");
-        
+        const cursorAnchor = editor.getCursor('anchor');
+        const cursorHead = editor.getCursor('head');
+
         editor.setLine(editor.lastLine(), newLastLineContent);
         editor.setSelection(cursorAnchor, cursorHead); // preserve original cursor / selection state (adding a new line may have pushed the cursor down)
 
         newString = selectedText.content; // because there is no other content on the newly created line, we don't need a trailing newline char
       }
-      
+
       const nextLineStart = {
         line: selectedText.end.line + 1,
-        ch: 0
-      }
+        ch: 0,
+      };
       editor.replaceRange(newString, nextLineStart, nextLineStart);
     }
   }
-  
+
   cleanSelected(): void {
     const view = this.app.workspace.getActiveViewOfType(MarkdownView);
     if (!view) return;
@@ -198,17 +196,17 @@ export default class HotkeysPlus extends Plugin {
   }
 
   onunload() {
-    console.log("Unloading Hotkeys++ plugin");
+    console.log('Unloading Hotkeys++ plugin');
   }
 
   getSelectedText(editor: Editor) {
     if (editor.somethingSelected()) {
       // Toggle to-dos under the selection
-      const cursorStart = editor.getCursor("from");
-      const cursorEnd = editor.getCursor("to");
+      const cursorStart = editor.getCursor('from');
+      const cursorEnd = editor.getCursor('to');
       const content = editor.getRange(
         { line: cursorStart.line, ch: 0 },
-        { line: cursorEnd.line, ch: editor.getLine(cursorEnd.line).length }
+        { line: cursorEnd.line, ch: editor.getLine(cursorEnd.line).length },
       );
 
       return {
@@ -257,12 +255,14 @@ export default class HotkeysPlus extends Plugin {
   }
 
   toggleTodos() {
-    const re = /(^\s*|^\t*)(-\s\[ \]\s|-\s\[x\]\s|\*\s|-\s|\d*\.\s|\*\s|\b|^)([^\n\r]*)/gim;
+    const re =
+      /(^\s*|^\t*)(-\s\[ \]\s|-\s\[x\]\s|\*\s|-\s|\d*\.\s|\*\s|\b|^)([^\n\r]*)/gim;
     return this.toggleElement(re, this.replaceTodoElement);
   }
 
   toggleLists() {
-    const re = /(^\s*|^\t*)(-\s\[ \]\s|-\s\[x\]\s|\*\s|-\s|\d*\.\s|\*\s|\b|^)([^\n\r]*)/gim;
+    const re =
+      /(^\s*|^\t*)(-\s\[ \]\s|-\s\[x\]\s|\*\s|-\s|\d*\.\s|\*\s|\b|^)([^\n\r]*)/gim;
     return this.toggleElement(re, this.replaceListElement);
   }
 
@@ -276,47 +276,55 @@ export default class HotkeysPlus extends Plugin {
     return this.toggleElement(re, this.replaceEmbed);
   }
 
-  replaceListElement(match: string, spaces: string, startText: string, sentence: string) {
-    if (startText === "- ") {
-      return spaces + "1. " + sentence;
-    } else if (startText === "") {
-      return spaces + "- " + sentence;
-    } else if (startText === "1. ") {
-      return spaces + "" + sentence;
+  replaceListElement(
+    match: string,
+    spaces: string,
+    startText: string,
+    sentence: string,
+  ) {
+    if (startText === '- ') {
+      return spaces + '1. ' + sentence;
+    } else if (startText === '') {
+      return spaces + '- ' + sentence;
+    } else if (startText === '1. ') {
+      return spaces + '' + sentence;
     } else {
-      return spaces + "- " + sentence;
+      return spaces + '- ' + sentence;
     }
   }
 
   replaceBlockQuote(startText: string) {
-    if (startText === "> ") {
-      return "";
-    } else if (startText === "") {
-      return "> ";
+    if (startText === '> ') {
+      return '';
+    } else if (startText === '') {
+      return '> ';
     } else {
-      return "> ";
+      return '> ';
     }
   }
 
   replaceEmbed(startText: string) {
-    if (startText === "![[") {
-      return "[[";
-    }
-    else if (startText === "[[") {
-      return "![[";
-    }
-    else {
-      return "";
+    if (startText === '![[') {
+      return '[[';
+    } else if (startText === '[[') {
+      return '![[';
+    } else {
+      return '';
     }
   }
 
-  replaceTodoElement(match: string, spaces: string, startText: string, sentence: string) {
-    if (startText === "- [ ] ") {
-      return spaces + "- [x] " + sentence;
-    } else if (startText === "- [x] ") {
-      return spaces + "- " + sentence;
+  replaceTodoElement(
+    match: string,
+    spaces: string,
+    startText: string,
+    sentence: string,
+  ) {
+    if (startText === '- [ ] ') {
+      return spaces + '- [x] ' + sentence;
+    } else if (startText === '- [x] ') {
+      return spaces + '- ' + sentence;
     } else {
-      return spaces + "- [ ] " + sentence;
+      return spaces + '- [ ] ' + sentence;
     }
   }
 }
