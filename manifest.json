@@ -2,9 +2,9 @@
   "id": "hotkeysplus-obsidian",
   "name": "Hotkeys++",
   "description": "Additional hotkeys to do common things in Obsidian",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "author": "Argentina Ortega Sainz",
-  "authorUrl": "",
+  "authorUrl": "https://argentinaos.com",
   "isDesktopOnly": false,
-  "minAppVersion": "0.9.16"
+  "minAppVersion": "0.12.19"
 }
